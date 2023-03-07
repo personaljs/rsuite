@@ -37,13 +37,15 @@ describe('DatePicker', () => {
   });
 
   it('Should be not cleanable', () => {
-    const instance = getDOMNode(<DatePicker cleanable={false} value={new Date()} />);
-    assert.ok(!instance.querySelector('.rs-picker-toggle-clean'));
+    render(<DatePicker cleanable={false} value={new Date()} />);
+
+    expect(screen.queryByRole('button', { name: /clear/i })).to.not.exist;
   });
 
   it('Should output a button', () => {
-    const instance = getDOMNode(<DatePicker toggleAs="button" />);
-    assert.equal((instance.querySelector('[role="combobox"]') as HTMLElement).tagName, 'BUTTON');
+    render(<DatePicker toggleAs="button" />);
+
+    expect(screen.getByRole('combobox')).to.have.tagName('BUTTON');
   });
 
   it('Should be block', () => {
@@ -53,15 +55,13 @@ describe('DatePicker', () => {
   });
 
   it('Should output a date', () => {
-    const instance = getDOMNode(<DatePicker defaultValue={parseISO('2017-08-14')} />);
-    assert.equal(
-      (instance.querySelector('.rs-picker-toggle-value') as HTMLElement).textContent,
-      '2017-08-14'
-    );
+    render(<DatePicker defaultValue={parseISO('2017-08-14')} />);
+
+    expect(screen.getByRole('combobox')).to.have.text('2017-08-14');
   });
 
   it('Should output custom value', () => {
-    const instance = getDOMNode(
+    render(
       <DatePicker
         value={parseISO('2017-08-14')}
         renderValue={value => {
@@ -70,18 +70,13 @@ describe('DatePicker', () => {
       />
     );
 
-    assert.equal(
-      (instance.querySelector('.rs-picker-toggle-value') as HTMLElement).textContent,
-      '08/14/2017'
-    );
+    expect(screen.getByRole('combobox')).to.have.text('08/14/2017');
   });
 
   it('Should output a date', () => {
-    const instance = getDOMNode(<DatePicker value={parseISO('2017-08-14')} />);
-    assert.equal(
-      (instance.querySelector('.rs-picker-toggle-value') as HTMLElement).textContent,
-      '2017-08-14'
-    );
+    render(<DatePicker value={parseISO('2017-08-14')} />);
+
+    expect(screen.getByRole('combobox')).to.have.text('2017-08-14');
   });
 
   it('Should open a dialog containing grid view of dates in a month', () => {
@@ -123,9 +118,9 @@ describe('DatePicker', () => {
 
   it('Should call `onChange` callback', () => {
     const onChangeSpy = sinon.spy();
-    const instance = getInstance(<DatePicker onChange={onChangeSpy} defaultOpen />);
+    render(<DatePicker onChange={onChangeSpy} defaultOpen />);
 
-    fireEvent.click(instance.overlay.querySelector('.rs-picker-toolbar-right .rs-btn'));
+    fireEvent.click(screen.getByRole('button', { name: /ok/i }));
 
     expect(onChangeSpy).to.calledOnce;
   });
@@ -134,6 +129,7 @@ describe('DatePicker', () => {
     const onChangeSpy = sinon.spy();
 
     const instance = getInstance(<DatePicker onChange={onChangeSpy} defaultOpen />);
+    // eslint-disable-next-line testing-library/no-node-access
     const today = instance.overlay.querySelector('.rs-picker-toolbar button');
 
     fireEvent.click(today);
